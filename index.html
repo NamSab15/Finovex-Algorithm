@@ -24,6 +24,11 @@
   --sh-1:0 1px 2px rgba(0,0,0,.25),0 10px 28px -14px rgba(0,0,0,.5);
   --sh-2:0 2px 4px rgba(0,0,0,.3),0 24px 54px -20px rgba(0,0,0,.65);
 }
+/* Per-page accent — everything downstream that reads var(--accent),
+   var(--accent-bright) or var(--accent-tint) re-themes automatically
+   inside these views. HEDG and Home keep the default emerald. */
+#view-sortit{--accent:var(--ochre);--accent-bright:var(--ochre-deep);--accent-tint:var(--ochre-tint)}
+#view-services{--accent:var(--slate);--accent-bright:var(--slate-deep);--accent-tint:var(--slate-tint)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:96px}
 body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--ink);overflow-x:clip;-webkit-font-smoothing:antialiased}
@@ -35,6 +40,8 @@ img,svg{display:block}
 a{color:inherit}
 button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
 .container{max-width:1200px;margin:0 auto;padding:0 24px}
+.view{display:none}
+.view.active{display:block}
 .serif{font-family:'Fraunces',serif;font-style:italic;font-weight:500}
 .ic{width:16px;height:16px;flex:none}.ic-sm{width:13px;height:13px;flex:none}.ic-lg{width:22px;height:22px;flex:none}
 .mono{width:44px;height:44px;border-radius:14px;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none;position:relative}
@@ -131,14 +138,31 @@ body.loaded .u-draw path{stroke-dashoffset:0}
 .scene-wrap{height:300vh}
 @media(max-width:700px){.scene-wrap{height:200vh}}
 .scene{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
-.scene-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:clamp(72px,12vw,190px);font-weight:700;letter-spacing:-.045em;opacity:0;pointer-events:none;user-select:none;white-space:nowrap;z-index:4;mix-blend-mode:overlay}
-#wordChaos{color:transparent;-webkit-text-stroke:2px rgba(237,238,233,.35)}
-#wordClarity{color:var(--ink);transform:translate(-50%,-50%)}
-.scene-head{position:relative;z-index:2;text-align:center}
-.scene-stage-tag{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);opacity:0;transition:opacity .5s;white-space:nowrap}
-.scene-stage-tag.on{opacity:1}
-#tagAfter{color:var(--accent-bright)}
-.scene-stage{position:relative;width:min(1080px,92vw);height:min(560px,56vh);margin:44px auto 0;z-index:1}
+.scene-head{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;padding:0 20px}
+.scene-caption{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--ink2)}
+.scene-track-row{display:flex;align-items:center;gap:16px;width:min(560px,90vw)}
+.scene-track-label{font-size:clamp(19px,3.4vw,28px);font-weight:700;letter-spacing:-.02em;white-space:nowrap;transition:opacity .2s linear}
+#wordChaos{color:transparent;-webkit-text-stroke:1.5px rgba(237,238,233,.55)}
+.scene-track-label.clarity{color:var(--accent-bright)}
+.scene-track{position:relative;flex:1;height:8px}
+.scene-track-fill{position:absolute;left:0;top:0;height:8px;border-radius:99px;background:linear-gradient(90deg, rgba(237,238,233,.35), var(--accent-bright));width:0;pointer-events:none}
+.scene-track::before{content:"";position:absolute;inset:0;height:8px;border-radius:99px;background:rgba(237,238,233,.12)}
+.scene-track input[type=range]{position:absolute;left:0;right:0;top:-8px;width:100%;height:24px;-webkit-appearance:none;appearance:none;background:transparent;cursor:ew-resize;margin:0;z-index:1}
+.scene-track input::-webkit-slider-runnable-track{height:8px;background:transparent}
+.scene-track input::-moz-range-track{height:8px;background:transparent}
+.scene-track input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.4);margin-top:-5px;cursor:ew-resize}
+.scene-track input::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--ink);border:3px solid var(--bg);cursor:ew-resize}
+.scene-track-meta{display:flex;align-items:center;gap:14px}
+.deck-play{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#101412;display:grid;place-items:center;flex:none;transition:background .25s}
+.deck-play:hover{background:var(--accent-bright)}
+.deck-play .ic{width:14px;height:14px}
+.deck-play .dp-pause{display:none}
+.deck-play.playing .dp-play{display:none}
+.deck-play.playing .dp-pause{display:block}
+.deck-count{font-size:11.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.deck-hint{font-size:11px;color:var(--ink2);font-weight:500;white-space:nowrap}
+@media(max-width:520px){.deck-hint{display:none}}
+.scene-stage{position:relative;width:min(1080px,92vw);height:min(560px,56vh);margin:36px auto 0;z-index:1}
 .chip{position:absolute;left:50%;top:50%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 12px;box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:7px;z-index:2;will-change:transform;transition:border-color .4s,box-shadow .4s}
 .chip-top{display:flex;align-items:center;gap:8px;min-width:0}
 .chip-ic{width:26px;height:26px;border-radius:8px;background:var(--cs);color:var(--cd);display:grid;place-items:center;flex:none}
@@ -156,25 +180,6 @@ body.loaded .u-draw path{stroke-dashoffset:0}
 .col-head .d{width:9px;height:9px;border-radius:3px;background:var(--c)}
 .col-head.on{opacity:1}
 .scene:not(.cols2) .col-head{display:flex}
-.deck{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;display:flex;align-items:center;gap:12px;background:rgba(22,29,26,.92);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:8px 14px 8px 8px;z-index:5;box-shadow:var(--sh-1);max-width:94vw}
-.deck-play{width:38px;height:38px;border-radius:50%;background:var(--ink);color:#101412;display:grid;place-items:center;flex:none;transition:background .25s}
-.deck-play:hover{background:var(--accent-bright)}
-.deck-play .ic{width:15px;height:15px}
-.deck-play .dp-pause{display:none}
-.deck-play.playing .dp-play{display:none}
-.deck-play.playing .dp-pause{display:block}
-.deck-track{position:relative;width:min(210px,32vw);height:20px;display:flex;align-items:center;flex:none}
-.deck-fill{position:absolute;left:0;top:8px;height:4px;border-radius:99px;background:var(--accent-bright);width:0;pointer-events:none}
-.deck-track input{width:100%;-webkit-appearance:none;appearance:none;background:transparent;position:relative;z-index:1;height:20px;cursor:ew-resize}
-.deck-track input::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:rgba(237,238,233,.16)}
-.deck-track input::-moz-range-track{height:4px;border-radius:99px;background:rgba(237,238,233,.16)}
-.deck-track input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.4);margin-top:-6px}
-.deck-track input::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--ink);border:3px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.deck-count{font-size:11.5px;font-weight:700;color:var(--ink2);white-space:nowrap;min-width:70px}
-.deck-jump{font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);transition:.25s;flex:none}
-.deck-jump:hover{background:var(--ink);color:#101412;border-color:var(--ink)}
-.deck-hint{font-size:11px;color:var(--ink2);font-weight:500;white-space:nowrap}
-@media(max-width:720px){.deck-hint,.deck-jump{display:none}.deck{gap:10px}}
 @media(max-width:640px){.chip-ic{width:22px;height:22px}.chip-name{font-size:10px}.chip-amt{font-size:11px}.chip-badge{font-size:9px}}
 
 .products-grid{display:flex;flex-direction:column;gap:16px;margin-top:52px}
@@ -492,26 +497,26 @@ html.js .rv.show .bars span{transform:scaleY(1)}
 
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a class="brand" href="#top">
+    <a class="brand" href="#/" data-route="/">
       <svg width="27" height="27" viewBox="0 0 26 26"><rect x="1.5" y="1.5" width="23" height="23" rx="7.5" fill="none" stroke="#EDEEE9" stroke-width="2.6"/><circle cx="16.5" cy="9.5" r="4.2" fill="#3ECF8E"/></svg>
       <span>finovex</span>
     </a>
     <nav class="nav-links">
-      <a href="#products">Products</a>
-      <a href="#hedge">HEDG</a>
-      <a href="#services">Services</a>
+      <a href="#/" data-route="/">Products</a>
+      <a href="#/hedg" data-route="/hedg">HEDG</a>
+      <a href="#/services" data-route="/services">Services</a>
     </nav>
     <span class="nav-region"><i data-lucide="globe" class="ic-sm"></i>India · INR</span>
-    <button class="motion-pill" id="motionToggle" aria-label="Toggle animations"><i data-lucide="sparkles" class="ic-sm"></i><span>Motion</span></button>
-    <a class="btn btn-primary btn-sm" href="#early-access">Get early access</a>
+    <a class="btn btn-primary btn-sm" href="#early-access" data-route="#early-access">Get early access</a>
     <button id="navBurger" aria-label="Menu"><i data-lucide="menu" class="ic-lg"></i></button>
   </div>
 </header>
 <div class="m-links" id="mLinks">
-  <a href="#products">Products</a><a href="#hedge">HEDG</a><a href="#services">Services</a><a href="#early-access">Get early access</a>
+  <a href="#/" data-route="/">Products</a><a href="#/hedg" data-route="/hedg">HEDG</a><a href="#/services" data-route="/services">Services</a><a href="#early-access" data-route="#early-access">Get early access</a>
 </div>
 
 <main>
+<div class="view active" id="view-home">
 <section class="hero">
   <div class="container hero-grid">
     <div>
@@ -522,8 +527,8 @@ html.js .rv.show .bars span{transform:scaleY(1)}
       </h1>
       <p class="hero-sub">Meet <strong>HEDG</strong>, our flagship — books, cashflow, GST and tax that quietly run themselves, so you can get back to building the actual business.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary mag" href="#products">See HEDG pricing <i data-lucide="arrow-right" class="ic"></i></a>
-        <a class="btn btn-ghost" href="#products">Explore the family</a>
+        <a class="btn btn-primary mag" href="#/hedg" data-route="/hedg">See HEDG pricing <i data-lucide="arrow-right" class="ic"></i></a>
+        <a class="btn btn-ghost" href="#products" data-route="#products">Explore the family</a>
       </div>
       <p class="hero-note"><i data-lucide="map-pin" class="ic-sm"></i>Made in Jaipur, for India's builders · Early access open</p>
     </div>
@@ -537,26 +542,25 @@ html.js .rv.show .bars span{transform:scaleY(1)}
 
 <section class="scene-wrap" id="sceneWrap">
   <div class="scene" id="sceneEl">
-    <div class="scene-word" id="wordChaos">CHAOS</div>
-    <div class="scene-word" id="wordClarity">CLARITY</div>
     <div class="scene-head">
-      <span class="scene-stage-tag on" id="tagBefore">This month, before HEDG</span>
-      <span class="scene-stage-tag" id="tagAfter">The same month, on HEDG</span>
+      <p class="scene-caption">Watch a month of transactions sort themselves</p>
+      <div class="scene-track-row">
+        <span class="scene-track-label" id="wordChaos">CHAOS</span>
+        <div class="scene-track">
+          <span class="scene-track-fill" id="deckFill"></span>
+          <input type="range" id="deckRange" min="0" max="1000" value="0" step="1" aria-label="Scrub the transformation">
+        </div>
+        <span class="scene-track-label clarity" id="wordClarity">CLARITY</span>
+      </div>
+      <div class="scene-track-meta">
+        <button class="deck-play" id="deckPlay" aria-label="Play the transformation">
+          <i data-lucide="play" class="ic dp-play"></i><i data-lucide="pause" class="ic dp-pause"></i>
+        </button>
+        <span class="deck-count" id="sceneNum">0/16 sorted</span>
+        <span class="deck-hint">You drive — or just scroll</span>
+      </div>
     </div>
     <div class="scene-stage" id="sceneStage"></div>
-    <div class="deck">
-      <button class="deck-play" id="deckPlay" aria-label="Play the transformation">
-        <i data-lucide="play" class="ic dp-play"></i><i data-lucide="pause" class="ic dp-pause"></i>
-      </button>
-      <div class="deck-track">
-        <span class="deck-fill" id="deckFill"></span>
-        <input type="range" id="deckRange" min="0" max="1000" value="0" step="1" aria-label="Scrub the transformation">
-      </div>
-      <span class="deck-count" id="sceneNum">0/16 sorted</span>
-      <button class="deck-jump" data-jump="0">Before</button>
-      <button class="deck-jump" data-jump="1">After</button>
-      <span class="deck-hint">You drive — or just scroll</span>
-    </div>
   </div>
 </section>
 
@@ -568,15 +572,14 @@ html.js .rv.show .bars span{transform:scaleY(1)}
         <h2>Every part of your money,<br><em class="serif">looked after.</em></h2>
       </div>
       <div class="sec-side rv" data-d=".12">
-        <p>One family of tools that actually talk to each other — start with one, add the rest as you grow. Built in Jaipur, priced for India, obsessive about the details.</p>
-        <p style="margin-top:14px"><span class="nav-region" style="display:inline-flex"><i data-lucide="globe" class="ic-sm"></i>India · INR ₹</span></p>
+        <p>Start with one, add the rest as you grow. Built in Jaipur, priced for India.</p>
       </div>
     </div>
 
     <div class="products-grid" id="prodGrid">
 
       <div class="rv">
-        <a class="product-card" href="#hedge">
+        <a class="product-card" href="#/hedg" data-route="/hedg">
           <div class="pc-media media-deep">
             <span class="pc-flag">Flagship</span>
             <div class="mock">
@@ -595,7 +598,7 @@ html.js .rv.show .bars span{transform:scaleY(1)}
       </div>
 
       <div class="rv" data-d=".08">
-        <a class="product-card" href="#early-access">
+        <a class="product-card" href="#/sortit" data-route="/sortit">
           <div class="pc-media media-lift">
             <span class="pc-flag flag-paper">Launching June 2026</span>
             <div class="fan">
@@ -615,7 +618,7 @@ html.js .rv.show .bars span{transform:scaleY(1)}
       </div>
 
       <div class="rv" data-d=".16">
-        <a class="product-card p-labs" href="#early-access">
+        <a class="product-card p-labs" href="#early-access" data-route="#early-access">
           <div class="pc-body">
             <span class="labs-ic"><i data-lucide="flask-conical" class="ic-lg"></i></span>
             <span class="pc-kicker">Finovex Labs</span>
@@ -627,142 +630,98 @@ html.js .rv.show .bars span{transform:scaleY(1)}
       </div>
 
     </div>
+  </div>
+</section>
 
-    <div class="sec-head rv" style="margin-top:56px; border-bottom:none; padding-bottom:0;">
-      <div>
-        <p class="kicker">HEDG pricing</p>
-        <h2 style="font-size:clamp(22px,3vw,30px)">One flat onboarding fee, then a plan sized to your volume.</h2>
-      </div>
-    </div>
-
-    <div class="price-grid" id="priceGrid"></div>
-    <div class="ent-row rv">
-      <p id="entText"></p>
-      <button class="btn btn-ghost btn-sm" data-cta="ent">Talk to us <i data-lucide="arrow-up-right" class="ic-sm"></i></button>
-    </div>
-
-    <div class="incl rv">
-      <h5>Every HEDG plan includes</h5>
-      <div class="incl-row">
-        <span><i data-lucide="shield-check" class="ic-sm"></i>Bank-grade encryption, at rest &amp; in transit</span>
-        <span><i data-lucide="calendar-check" class="ic-sm"></i>12-month engagement · 30-day exit notice after Q1</span>
-        <span><i data-lucide="users" class="ic-sm"></i>Real humans on support, 7 days a week</span>
-        <span><i data-lucide="landmark" class="ic-sm"></i>GST-compliant invoices &amp; reports</span>
-      </div>
+<section id="belief">
+  <div class="mani-wrap" id="maniWrap">
+    <div class="mani-sticky" id="maniSticky">
+      <p class="kicker">The Finovex belief</p>
+      <p class="mani-text" id="maniText"></p>
+      <p class="mani-sig"><i data-lucide="map-pin" class="ic-sm"></i>Finovex Algorithm Pvt Ltd · Jaipur, Rajasthan</p>
     </div>
   </div>
 </section>
 
-<section class="sec" id="services">
+<!-- ================= CUSTOMERS / TESTIMONIALS — DISABLED FOR NOW =================
+   Real customer base isn't ready to show publicly yet. Re-enable by
+   uncommenting this section (and the matching JS block further down,
+   search for the same marker) once there's a customer story to tell.
+<section class="sec alt" id="customers">
   <div class="container">
     <div class="sec-head">
       <div class="rv">
-        <p class="kicker">Services</p>
-        <h2>Registration, compliance<br><em class="serif">and everything in between.</em></h2>
+        <p class="kicker">Customers</p>
+        <h2>Pilot partners,<br><em class="serif">in their own words.</em></h2>
       </div>
       <div class="sec-side rv" data-d=".12">
-        <p>Startup registration, trademarks &amp; IP, GST, income tax and MCA compliance. Drag sideways to browse, tap Enquire for a quote — no listed pricing, every business is sized differently.</p>
+        <p>Video stories from our early design partners — real quotes, placeholder posters until the films are cut. Tap any card for the story.</p>
       </div>
     </div>
 
-    <div class="services-hint rv"><i data-lucide="arrow-right" class="ic-sm"></i>Drag sideways to browse</div>
-    <div class="services-scroll rv" id="svcScroll">
+    <div class="tfilters rv" id="tFilters">
+      <button class="active" data-fcat="all">All stories</button>
+      <button data-fcat="founders">Founders</button>
+      <button data-fcat="freelancers">Freelancers</button>
+      <button data-fcat="retail">Retail &amp; cafés</button>
+    </div>
 
-      <article class="svc-card">
-        <h3>Startups</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>Proprietorship</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Partnership Firm</li>
-          <li><i data-lucide="check" class="ic-sm"></i>LLP Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Private Limited Company</li>
-          <li><i data-lucide="check" class="ic-sm"></i>One Person Company</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Indian Subsidiary</li>
-        </ul>
-        <p class="svc-more">+ more entity types available</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Startups">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
+    <div id="vGrid"></div>
 
-      <article class="svc-card">
-        <h3>Registration &amp; Licenses</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>Startup India</li>
-          <li><i data-lucide="check" class="ic-sm"></i>FSSAI Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>PF Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>ESI Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Udyam Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>DGFT / IEC Code</li>
-        </ul>
-        <p class="svc-more">+ ISO, DSC, Fire License &amp; more</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Registration%20%26%20Licenses">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
+    <div class="quotes rv" id="qBox">
+      <i data-lucide="quote" class="q-mark"></i>
+      <p class="q-text serif" id="qText"></p>
+      <div class="q-who"><span class="mono" id="qMono"></span><div><strong id="qWho"></strong><span id="qSub"></span></div></div>
+      <div class="q-ctl">
+        <button class="q-btn" id="qPrev" aria-label="Previous quote"><i data-lucide="chevron-left" class="ic"></i></button>
+        <div class="q-dots" id="qDots"></div>
+        <button class="q-btn" id="qNext" aria-label="Next quote"><i data-lucide="chevron-right" class="ic"></i></button>
+        <span class="q-auto"><i data-lucide="pause" class="ic-sm"></i>auto-advances · hovers to pause</span>
+      </div>
+    </div>
 
-      <article class="svc-card">
-        <h3>Trademarks &amp; IP</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>Trademark Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Trademark Objection</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Trademark Renewal</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Copyright Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Patent Filing</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Design Registration</li>
-        </ul>
-        <p class="svc-more">+ IP watch service available</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Trademarks%20%26%20IP">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
+    <div class="t-stats rv">
+      <div class="t-stat"><b><span class="count" data-target="32"></span></b><p>design partners in the pilot</p></div>
+      <div class="t-stat"><b><span class="count" data-target="4.9" data-decimals="1" data-suffix="/5"></span></b><p>average pilot rating</p></div>
+      <div class="t-stat"><b><span class="count" data-target="412"></span></b><p>shoeboxes of receipts digitised</p></div>
+      <div class="t-stat"><b><span class="count" data-target="11"></span></b><p>industries, one tiny team</p></div>
+    </div>
 
-      <article class="svc-card">
-        <h3>GST</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>GST Registration</li>
-          <li><i data-lucide="check" class="ic-sm"></i>GST Return Filing</li>
-          <li><i data-lucide="check" class="ic-sm"></i>GST Annual Return (GSTR-9)</li>
-          <li><i data-lucide="check" class="ic-sm"></i>GST Notice Reply</li>
-          <li><i data-lucide="check" class="ic-sm"></i>GST LUT Filing</li>
-          <li><i data-lucide="check" class="ic-sm"></i>GST Amendment</li>
-        </ul>
-        <p class="svc-more">Monthly filing plans available</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20GST">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
-
-      <article class="svc-card">
-        <h3>Income Tax</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>Individual ITR</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Business ITR</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Company ITR</li>
-          <li><i data-lucide="check" class="ic-sm"></i>TDS Return Filing</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Income Tax Notice Reply</li>
-          <li><i data-lucide="check" class="ic-sm"></i>15CA-15CB</li>
-        </ul>
-        <p class="svc-more">Individual &amp; business filings</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Income%20Tax">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
-
-      <article class="svc-card">
-        <h3>MCA &amp; Compliance</h3>
-        <ul class="svc-list">
-          <li><i data-lucide="check" class="ic-sm"></i>Annual Company Compliance</li>
-          <li><i data-lucide="check" class="ic-sm"></i>LLP Compliance</li>
-          <li><i data-lucide="check" class="ic-sm"></i>DIN KYC</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Authorized Capital Increase</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Share Transfer</li>
-          <li><i data-lucide="check" class="ic-sm"></i>Winding Up</li>
-        </ul>
-        <p class="svc-more">+ shareholder agreements &amp; more</p>
-        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20MCA%20%26%20Compliance">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
-      </article>
-
+    <div class="logo-row rv">
+      <span class="lr-label">Pilot partners &amp; friendly teams</span>
+      <div class="lr-marks">
+        <span class="lm lm-1">Harit &amp; Co.</span><span class="lm lm-2">Chai Theory</span><span class="lm lm-3">Bhoomi Naturals</span><span class="lm lm-4">Studio Makhdoom</span><span class="lm lm-5">Kesar Textiles</span><span class="lm lm-6">pixel+prakash</span>
+      </div>
     </div>
   </div>
 </section>
+================= END CUSTOMERS / TESTIMONIALS ================= -->
 
+<section class="cta" id="early-access">
+  <div class="cta-card rv">
+    <p class="kicker">Early access · India first</p>
+    <h2>Get your money <em class="serif">sorted.</em></h2>
+    <p class="lead">Join the waitlist and be first in line for HEDG. Founding users get onboarding personally handled by the team that built it.</p>
+    <form class="wait-form" id="waitForm" novalidate>
+      <input type="email" id="waitEmail" placeholder="you@yourbusiness.in" aria-label="Email address">
+      <button class="btn btn-accent mag" type="submit" id="waitBtn">Join the waitlist <i data-lucide="arrow-right" class="ic"></i></button>
+    </form>
+    <p class="wait-micro"><i data-lucide="lock" class="ic-sm"></i>No card. No spam. First 500 get founding-user pricing for life.</p>
+  </div>
+</section>
+</div>
+
+<div class="view" id="view-hedg">
 <section class="feat-head" id="hedge">
-  <div class="container sec-head">
-    <div class="rv">
-      <p class="kicker">Inside HEDG</p>
-      <h2>The finance office layer, <em class="serif">without the chase.</em></h2>
+  <div class="container">
+    <a class="text-link" href="#/" data-route="/" style="margin-bottom:18px;color:var(--accent-bright)"><i data-lucide="chevron-left" class="ic-sm"></i>Back to products</a>
+    <div class="sec-head">
+      <div class="rv">
+        <p class="kicker">Inside HEDG</p>
+        <h2>The finance office layer, <em class="serif">without the chase.</em></h2>
+      </div>
+      <div class="sec-side rv" data-d=".12"><p>Manual-first today — on email, WhatsApp and Excel — automating progressively as HEDG modules go live. Scroll on, or use the arrows below.</p></div>
     </div>
-    <div class="sec-side rv" data-d=".12"><p>Manual-first today — on email, WhatsApp and Excel — automating progressively as HEDG modules go live. Scroll on, or use the arrows below.</p></div>
   </div>
 </section>
 
@@ -869,89 +828,230 @@ html.js .rv.show .bars span{transform:scaleY(1)}
   </div>
 </section>
 
-<section id="belief">
-  <div class="mani-wrap" id="maniWrap">
-    <div class="mani-sticky" id="maniSticky">
-      <p class="kicker">The Finovex belief</p>
-      <p class="mani-text" id="maniText"></p>
-      <p class="mani-sig"><i data-lucide="map-pin" class="ic-sm"></i>Finovex Algorithm Pvt Ltd · Jaipur, Rajasthan</p>
+<section class="sec">
+  <div class="container">
+    <div class="sec-head rv" style="border-bottom:none; padding-bottom:0;">
+      <div>
+        <p class="kicker">HEDG pricing</p>
+        <h2 style="font-size:clamp(22px,3vw,30px)">One flat onboarding fee, then a plan sized to your volume.</h2>
+      </div>
+    </div>
+
+    <div class="price-grid" id="priceGrid"></div>
+    <div class="ent-row rv">
+      <p id="entText"></p>
+      <button class="btn btn-ghost btn-sm" data-cta="ent">Talk to us <i data-lucide="arrow-up-right" class="ic-sm"></i></button>
+    </div>
+
+    <div class="incl rv">
+      <h5>Every HEDG plan includes</h5>
+      <div class="incl-row">
+        <span><i data-lucide="shield-check" class="ic-sm"></i>Bank-grade encryption, at rest &amp; in transit</span>
+        <span><i data-lucide="calendar-check" class="ic-sm"></i>12-month engagement · 30-day exit notice after Q1</span>
+        <span><i data-lucide="users" class="ic-sm"></i>Real humans on support, 7 days a week</span>
+        <span><i data-lucide="landmark" class="ic-sm"></i>GST-compliant invoices &amp; reports</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= CUSTOMERS / TESTIMONIALS — DISABLED FOR NOW =================
-   Real customer base isn't ready to show publicly yet. Re-enable by
-   uncommenting this section (and the matching JS block further down,
-   search for the same marker) once there's a customer story to tell.
-<section class="sec alt" id="customers">
+</div>
+
+<div class="view" id="view-sortit">
+<section class="feat-head">
+  <div class="container">
+    <a class="text-link" href="#/" data-route="/" style="margin-bottom:18px;color:var(--accent-bright)"><i data-lucide="chevron-left" class="ic-sm"></i>Back to products</a>
+    <div class="sec-head">
+      <div class="rv">
+        <p class="kicker">SORT.it · Launching June 2026</p>
+        <h2>Your money, <em class="serif">explained every day.</em></h2>
+      </div>
+      <div class="sec-side rv" data-d=".12">
+        <p>An intelligent financial companion that helps you track, plan, save, and grow — all from a single unified experience. Jaipur, India · Pan-India &amp; Metro Cities.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
   <div class="container">
     <div class="sec-head">
       <div class="rv">
-        <p class="kicker">Customers</p>
-        <h2>Pilot partners,<br><em class="serif">in their own words.</em></h2>
+        <p class="kicker">The problem</p>
+        <h2 style="font-size:clamp(22px,3vw,30px)">Money should feel simple. Why does it feel so hard?</h2>
+      </div>
+    </div>
+    <div class="products-grid">
+      <div class="rv">
+        <div class="product-card" style="cursor:default">
+          <div class="pc-body">
+            <span class="pc-kicker">Fragmented finances</span>
+            <h3 style="font-size:20px">Everything, scattered</h3>
+            <p>Bank accounts, UPI apps, investments, loans, insurance and taxes all live in separate places — making it hard to see the complete picture.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rv" data-d=".08">
+        <div class="product-card" style="cursor:default">
+          <div class="pc-body">
+            <span class="pc-kicker">Reactive money management</span>
+            <h3 style="font-size:20px">Tracked too late</h3>
+            <p>Most people track spending after it happens, not before. Without insights and planning, financial decisions become guesswork.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rv" data-d=".16">
+        <div class="product-card" style="cursor:default">
+          <div class="pc-body">
+            <span class="pc-kicker">Goals without a roadmap</span>
+            <h3 style="font-size:20px">No clear system</h3>
+            <p>Buying a home, building wealth, retiring comfortably — people lack a clear system to plan, track and achieve their financial goals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="incl rv" style="margin-top:64px">
+      <h5>What SORT.it does</h5>
+      <div class="incl-row">
+        <span><i data-lucide="check" class="ic-sm"></i>Complete Financial Picture</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Automated Transaction Tracking</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Real-Time Cash Flow</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Net Worth Dashboard</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Smart Alerts</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Financial Health Score</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Spending Analytics</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Cash Flow Forecasting</span>
+        <span><i data-lucide="check" class="ic-sm"></i>AI-Powered Insights</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Income Intelligence</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Personalized Recommendations</span>
+        <span><i data-lucide="check" class="ic-sm"></i>Automated Reports</span>
+      </div>
+    </div>
+
+    <div class="ent-row rv">
+      <p>Every transaction tells a story. SORT.it helps you understand it — join the waitlist to be first in line when it launches.</p>
+      <button class="btn btn-accent btn-sm mag" data-route="#early-access">Join the waitlist <i data-lucide="arrow-up-right" class="ic-sm"></i></button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="view" id="view-services">
+<section class="sec" id="services">
+  <div class="container">
+    <a class="text-link" href="#/" data-route="/" style="margin-bottom:8px"><i data-lucide="chevron-left" class="ic-sm"></i>Back to home</a>
+    <div class="sec-head">
+      <div class="rv">
+        <p class="kicker">Services</p>
+        <h2>Registration, compliance<br><em class="serif">and everything in between.</em></h2>
       </div>
       <div class="sec-side rv" data-d=".12">
-        <p>Video stories from our early design partners — real quotes, placeholder posters until the films are cut. Tap any card for the story.</p>
+        <p>Startup registration, trademarks &amp; IP, GST, income tax and MCA compliance. Drag sideways to browse, tap Enquire for a quote — no listed pricing, every business is sized differently.</p>
       </div>
     </div>
 
-    <div class="tfilters rv" id="tFilters">
-      <button class="active" data-fcat="all">All stories</button>
-      <button data-fcat="founders">Founders</button>
-      <button data-fcat="freelancers">Freelancers</button>
-      <button data-fcat="retail">Retail &amp; cafés</button>
-    </div>
+    <div class="services-hint rv"><i data-lucide="arrow-right" class="ic-sm"></i>Drag sideways to browse</div>
+    <div class="services-scroll rv" id="svcScroll">
 
-    <div id="vGrid"></div>
+      <article class="svc-card">
+        <h3>Startups</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>Proprietorship</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Partnership Firm</li>
+          <li><i data-lucide="check" class="ic-sm"></i>LLP Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Private Limited Company</li>
+          <li><i data-lucide="check" class="ic-sm"></i>One Person Company</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Indian Subsidiary</li>
+        </ul>
+        <p class="svc-more">+ more entity types available</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Startups">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
 
-    <div class="quotes rv" id="qBox">
-      <i data-lucide="quote" class="q-mark"></i>
-      <p class="q-text serif" id="qText"></p>
-      <div class="q-who"><span class="mono" id="qMono"></span><div><strong id="qWho"></strong><span id="qSub"></span></div></div>
-      <div class="q-ctl">
-        <button class="q-btn" id="qPrev" aria-label="Previous quote"><i data-lucide="chevron-left" class="ic"></i></button>
-        <div class="q-dots" id="qDots"></div>
-        <button class="q-btn" id="qNext" aria-label="Next quote"><i data-lucide="chevron-right" class="ic"></i></button>
-        <span class="q-auto"><i data-lucide="pause" class="ic-sm"></i>auto-advances · hovers to pause</span>
-      </div>
-    </div>
+      <article class="svc-card">
+        <h3>Registration &amp; Licenses</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>Startup India</li>
+          <li><i data-lucide="check" class="ic-sm"></i>FSSAI Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>PF Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>ESI Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Udyam Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>DGFT / IEC Code</li>
+        </ul>
+        <p class="svc-more">+ ISO, DSC, Fire License &amp; more</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Registration%20%26%20Licenses">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
 
-    <div class="t-stats rv">
-      <div class="t-stat"><b><span class="count" data-target="32"></span></b><p>design partners in the pilot</p></div>
-      <div class="t-stat"><b><span class="count" data-target="4.9" data-decimals="1" data-suffix="/5"></span></b><p>average pilot rating</p></div>
-      <div class="t-stat"><b><span class="count" data-target="412"></span></b><p>shoeboxes of receipts digitised</p></div>
-      <div class="t-stat"><b><span class="count" data-target="11"></span></b><p>industries, one tiny team</p></div>
-    </div>
+      <article class="svc-card">
+        <h3>Trademarks &amp; IP</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>Trademark Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Trademark Objection</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Trademark Renewal</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Copyright Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Patent Filing</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Design Registration</li>
+        </ul>
+        <p class="svc-more">+ IP watch service available</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Trademarks%20%26%20IP">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
 
-    <div class="logo-row rv">
-      <span class="lr-label">Pilot partners &amp; friendly teams</span>
-      <div class="lr-marks">
-        <span class="lm lm-1">Harit &amp; Co.</span><span class="lm lm-2">Chai Theory</span><span class="lm lm-3">Bhoomi Naturals</span><span class="lm lm-4">Studio Makhdoom</span><span class="lm lm-5">Kesar Textiles</span><span class="lm lm-6">pixel+prakash</span>
-      </div>
+      <article class="svc-card">
+        <h3>GST</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>GST Registration</li>
+          <li><i data-lucide="check" class="ic-sm"></i>GST Return Filing</li>
+          <li><i data-lucide="check" class="ic-sm"></i>GST Annual Return (GSTR-9)</li>
+          <li><i data-lucide="check" class="ic-sm"></i>GST Notice Reply</li>
+          <li><i data-lucide="check" class="ic-sm"></i>GST LUT Filing</li>
+          <li><i data-lucide="check" class="ic-sm"></i>GST Amendment</li>
+        </ul>
+        <p class="svc-more">Monthly filing plans available</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20GST">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
+
+      <article class="svc-card">
+        <h3>Income Tax</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>Individual ITR</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Business ITR</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Company ITR</li>
+          <li><i data-lucide="check" class="ic-sm"></i>TDS Return Filing</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Income Tax Notice Reply</li>
+          <li><i data-lucide="check" class="ic-sm"></i>15CA-15CB</li>
+        </ul>
+        <p class="svc-more">Individual &amp; business filings</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20Income%20Tax">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
+
+      <article class="svc-card">
+        <h3>MCA &amp; Compliance</h3>
+        <ul class="svc-list">
+          <li><i data-lucide="check" class="ic-sm"></i>Annual Company Compliance</li>
+          <li><i data-lucide="check" class="ic-sm"></i>LLP Compliance</li>
+          <li><i data-lucide="check" class="ic-sm"></i>DIN KYC</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Authorized Capital Increase</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Share Transfer</li>
+          <li><i data-lucide="check" class="ic-sm"></i>Winding Up</li>
+        </ul>
+        <p class="svc-more">+ shareholder agreements &amp; more</p>
+        <a class="svc-enquire" href="mailto:hello@finovex.example?subject=Enquiry%3A%20MCA%20%26%20Compliance">Enquire <i data-lucide="arrow-up-right" class="ic-sm"></i></a>
+      </article>
+
     </div>
   </div>
 </section>
-================= END CUSTOMERS / TESTIMONIALS ================= -->
 
-<section class="cta" id="early-access">
-  <div class="cta-card rv">
-    <p class="kicker">Early access · India first</p>
-    <h2>Get your money <em class="serif">sorted.</em></h2>
-    <p class="lead">Join the waitlist and be first in line for HEDG. Founding users get onboarding personally handled by the team that built it.</p>
-    <form class="wait-form" id="waitForm" novalidate>
-      <input type="email" id="waitEmail" placeholder="you@yourbusiness.in" aria-label="Email address">
-      <button class="btn btn-accent mag" type="submit" id="waitBtn">Join the waitlist <i data-lucide="arrow-right" class="ic"></i></button>
-    </form>
-    <p class="wait-micro"><i data-lucide="lock" class="ic-sm"></i>No card. No spam. First 500 get founding-user pricing for life.</p>
-  </div>
-</section>
+</div>
+
 </main>
 
 <footer class="footer">
   <div class="container">
     <div class="foot-grid">
       <div>
-        <a class="brand" href="#top">
+        <a class="brand" href="#/" data-route="/">
           <svg width="27" height="27" viewBox="0 0 26 26"><rect x="1.5" y="1.5" width="23" height="23" rx="7.5" fill="none" stroke="#EDEEE9" stroke-width="2.6"/><circle cx="16.5" cy="9.5" r="4.2" fill="#3ECF8E"/></svg>
           <span>finovex</span>
         </a>
@@ -963,8 +1063,8 @@ html.js .rv.show .bars span{transform:scaleY(1)}
           <a href="#" class="stub" data-msg="We post where it matters — social links go live with the public launch."><i data-lucide="instagram" class="ic"></i></a>
         </div>
       </div>
-      <div class="foot-col"><h6>Products</h6><a href="#hedge">HEDG</a><a href="#products">SORT.it</a><a href="#early-access">Finovex Labs</a></div>
-      <div class="foot-col"><h6>Company</h6><a href="#belief">The belief</a><a href="#services">Services</a><a href="#products">Pricing</a><a href="#" class="stub" data-msg="We're a small team in Jaipur — roles open soon. Join the waitlist and we'll ping you first.">Careers</a></div>
+      <div class="foot-col"><h6>Products</h6><a href="#/hedg" data-route="/hedg">HEDG</a><a href="#/sortit" data-route="/sortit">SORT.it</a><a href="#early-access" data-route="#early-access">Finovex Labs</a></div>
+      <div class="foot-col"><h6>Company</h6><a href="#belief" data-route="#belief">The belief</a><a href="#/services" data-route="/services">Services</a><a href="#/hedg" data-route="/hedg">Pricing</a><a href="#" class="stub" data-msg="We're a small team in Jaipur — roles open soon. Join the waitlist and we'll ping you first.">Careers</a></div>
       <div class="foot-col"><h6>Legal</h6><a href="#" class="stub" data-msg="Privacy policy ships with the public launch.">Privacy</a><a href="#" class="stub" data-msg="Terms ship with the public launch.">Terms</a><a href="#" class="stub" data-msg="Our security whitepaper is in the works — ask us anything meanwhile.">Security</a></div>
     </div>
     <div class="foot-bottom">
@@ -995,7 +1095,7 @@ html.js .rv.show .bars span{transform:scaleY(1)}
   const fmtIN = n => n.toLocaleString('en-IN');
   const initials = n => n.split(/[\s&]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 
-  window.FX_STATE = { motion: !matchMedia('(prefers-reduced-motion: reduce)').matches };
+  window.FX_STATE = { motion: typeof matchMedia === 'function' ? !matchMedia('(prefers-reduced-motion: reduce)').matches : true };
   const animOK = () => FX_STATE.motion;
   const M = (typeof Motion !== 'undefined') ? Motion : null;
   const EASE = [.22,.7,.16,1];
@@ -1060,6 +1160,47 @@ html.js .rv.show .bars span{transform:scaleY(1)}
     });
   }
 
+  // ---- Tiny hash router ----
+  // Routes: "/" home, "/hedg" HEDG detail, "/sortit" SORT.it detail,
+  // "/services" the compliance services page. Anything not starting
+  // with "/" (e.g. "#early-access", "#belief") is a plain in-page
+  // anchor that always resolves against the home view.
+  const VIEW_MAP = {
+    '/': 'view-home',
+    '/hedg': 'view-hedg',
+    '/sortit': 'view-sortit',
+    '/services': 'view-services'
+  };
+  function showView(id){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+  }
+  function route(){
+    const raw = window.location.hash || '#/';
+    if (raw.startsWith('#/')) {
+      const path = raw.slice(1) || '/';
+      showView(VIEW_MAP[path] || 'view-home');
+      window.scrollTo(0, 0);
+    } else {
+      showView('view-home');
+      const anchorId = raw.replace('#', '');
+      requestAnimationFrame(() => {
+        const el = document.getElementById(anchorId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        else window.scrollTo(0, 0);
+      });
+    }
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-route]');
+    if (!el) return;
+    e.preventDefault();
+    const r = el.getAttribute('data-route');
+    const target = '#' + (r.startsWith('/') ? r : r.replace(/^#/, ''));
+    if (window.location.hash === target) route();
+    else window.location.hash = target;
+  });
+  window.addEventListener('hashchange', route);
+
   let toastTimer;
   function toast(msg, icon='check'){
     const el = $('#toast');
@@ -1107,9 +1248,13 @@ html.js .rv.show .bars span{transform:scaleY(1)}
           }catch(e){ el.classList.add('show'); }
         }, {margin:'0px 0px -8% 0px'});
       });
-    } else {
+    } else if (typeof IntersectionObserver === 'function') {
       const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); } }), {threshold:.1});
       $$('.rv').forEach(el=>io.observe(el));
+    } else {
+      // No IntersectionObserver and no Motion library available — reveal
+      // everything immediately rather than leaving it stuck at opacity:0.
+      $$('.rv').forEach(el=>el.classList.add('show'));
     }
   }
 
@@ -1127,8 +1272,12 @@ html.js .rv.show .bars span{transform:scaleY(1)}
     }catch(e){}
     if(!done) write(target);
   }
-  const cio = new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; runCounter(e.target); cio.unobserve(e.target); }), {threshold:.5});
-  $$('.count').forEach(el=>cio.observe(el));
+  if (typeof IntersectionObserver === 'function') {
+    const cio = new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; runCounter(e.target); cio.unobserve(e.target); }), {threshold:.5});
+    $$('.count').forEach(el=>cio.observe(el));
+  } else {
+    $$('.count').forEach(el=>runCounter(el));
+  }
 
   const CATS = [['food','Food & Dining'],['travel','Travel & Fuel'],['office','Office & Admin'],['income','Income']];
   const CHIPS = [
@@ -1195,10 +1344,8 @@ html.js .rv.show .bars span{transform:scaleY(1)}
     });
   }
   function sceneUpdate(p){
-    $('#wordChaos').style.opacity = (1 - clamp(p*2.2,0,1))*0.9;
-    $('#wordClarity').style.opacity = clamp((p-0.55)*2.4,0,1)*0.95;
-    $('#tagBefore').classList.toggle('on', p<0.45);
-    $('#tagAfter').classList.toggle('on', p>=0.45);
+    $('#wordChaos').style.opacity = 1 - p*0.65;
+    $('#wordClarity').style.opacity = 0.35 + p*0.65;
     const headsOn = p>0.72 && !$('#sceneEl').classList.contains('cols2');
     headEls.forEach(el=>el.classList.toggle('on', headsOn));
     let sorted = 0;
@@ -1248,17 +1395,6 @@ html.js .rv.show .bars span{transform:scaleY(1)}
     deckPlay.classList.add('playing');
     if(!animOK()){ deck.manualP = 1; stopPlay(); }
   });
-  $$('.deck-jump').forEach(b=>b.addEventListener('click', ()=>{
-    if(deck.playing) stopPlay();
-    const to = parseFloat(b.dataset.jump), from = getSceneP();
-    deck.manualUntil = performance.now()+1800;
-    if(M && animOK()){
-      try{
-        const a = M.animate(from, to, {duration:.9, ease:EASE, onUpdate:v=>deck.manualP=v});
-        Promise.resolve(a.finished||a).then(()=>deck.manualP=to).catch(()=>deck.manualP=to);
-      }catch(e){ deck.manualP = to; }
-    } else deck.manualP = to;
-  }));
 
   const texts = $$('.feat-text'), panels = $$('.panel'), dots = $$('#featDots button');
   const featWrap = $('#featWrap');
@@ -1614,15 +1750,6 @@ html.js .rv.show .bars span{transform:scaleY(1)}
   $('#navBurger').addEventListener('click', ()=>document.body.classList.toggle('nav-open'));
   $$('#mLinks a').forEach(a=>a.addEventListener('click', ()=>document.body.classList.remove('nav-open')));
 
-  const mt = $('#motionToggle');
-  if(!FX_STATE.motion) mt.classList.add('off');
-  mt.addEventListener('click', ()=>{
-    const off = document.documentElement.classList.toggle('no-motion');
-    FX_STATE.motion = !off;
-    mt.classList.toggle('off', off);
-    toast(off ? 'Animations paused — the page is yours.' : 'Animations back on.', off ? 'pause' : 'sparkles');
-  });
-
   function setupServicesDrag(){
     const el = $('#svcScroll');
     if (!el) return;
@@ -1651,6 +1778,7 @@ html.js .rv.show .bars span{transform:scaleY(1)}
   setupReveal();
   layoutScene();
   setupServicesDrag();
+  route();
   let rz;
   addEventListener('resize', ()=>{
     clearTimeout(rz);
