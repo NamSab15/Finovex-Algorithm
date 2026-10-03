@@ -541,7 +541,7 @@ try {
 const bill = $('#billSwitch');
 if (bill) bill.addEventListener('change', () => {
   const annual = bill.checked;
-  $$('.amt[data-m]').forEach(a => a.textContent = (annual ? a.dataset.a : a.dataset.m).toLocaleString('en-IN'));
+  $$('.amt[data-m]').forEach(a => a.textContent = Number(annual ? a.dataset.a : a.dataset.m).toLocaleString('en-IN'));
   $$('.per[data-p]').forEach(p => p.textContent = annual ? '/mo billed yearly' : '/month');
 });
 } catch (e) { console.error('[pricing toggle]', e); }

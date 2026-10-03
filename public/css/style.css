@@ -718,3 +718,5 @@ html.js .rail-visual .bars span{transform:none}
 /* ---------- contact form opt-in ---------- */
 .opt-in{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink2);line-height:1.5;margin:4px 0 16px;cursor:pointer}
 .opt-in input{margin-top:3px;accent-color:var(--acc-b);width:16px;height:16px;flex:none}
+
+.tier-one{font-size:12.5px;font-weight:600;color:var(--clay-deep);margin-top:6px}

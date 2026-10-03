@@ -100,9 +100,9 @@ module.exports = function setupCRM({ app, db, sendMail, mailerReady, str, isEmai
           subject: () => 'HEDG plans, and how the 30 day pilot works',
           body: c => `${hi(c)}<p>A quick look at HEDG pricing, since it is usually the next question:</p>
           <ul><li><b>Essential</b>, ₹22,500 a month: books, GST and TDS filings, monthly MIS</li>
-          <li><b>Growth</b>, ₹45,000 a month: everything in Essential plus Virtual CFO, cashflow forecasting and fundraising prep. Starts with a 30 day pilot.</li>
+          <li><b>Growth</b>, ₹55,000 a month: everything in Essential plus Virtual CFO, cashflow forecasting and fundraising prep. Starts with a 30 day pilot.</li>
           <li><b>Custom</b> for groups and multi entity structures</li></ul>
-          <p>Prices exclude GST, and you can switch plans any month. Reply to this email or send an enquiry and we will size it for you.</p>${btn(siteUrl + '/hedg#pricing', 'Compare HEDG plans')}`
+          <p>Both plans have a one-time onboarding fee of ₹10,000. Prices exclude GST, and you can switch plans any month. Reply to this email or send an enquiry and we will size it for you.</p>${btn(siteUrl + '/hedg#pricing', 'Compare HEDG plans')}`
         }
       ]
     },
