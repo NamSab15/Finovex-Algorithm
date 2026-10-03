@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM · Finovex</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26"><rect x="1.5" y="1.5" width="23" height="23" rx="7.5" fill="none" stroke="%23EDEEE9" stroke-width="2.6"/><circle cx="16.5" cy="9.5" r="4.2" fill="%233ECF8E"/></svg>'>
+<style>
+:root{--bg:#0F1412;--sf:#161D1A;--sf2:#1B2420;--ink:#EDEEE9;--ink2:#9CA5A0;--line:rgba(237,238,233,.1);--acc:#5ED69A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font:14px/1.5 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+a{color:var(--acc)}
+.gate{max-width:380px;margin:18vh auto;padding:34px;background:var(--sf);border:1px solid var(--line);border-radius:20px;text-align:center}
+.gate h1{font-size:22px;margin-bottom:6px}
+.gate p{color:var(--ink2);margin-bottom:20px}
+.gate input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font:inherit;margin-bottom:10px}
+.gate button{width:100%;background:var(--acc);color:#08110c;border:none;border-radius:10px;padding:12px;font:inherit;font-weight:700;cursor:pointer}
+.gate .err{color:#EDB894;font-size:12.5px;margin-top:12px;min-height:1em}
+header{display:flex;align-items:center;gap:18px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--sf);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header h1{font-size:17px}
+nav{display:flex;gap:6px}
+nav button{background:none;border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}
+nav button.active{background:var(--ink);color:#101412;border-color:var(--ink)}
+.spacer{flex:1}
+.hbtn{background:none;border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:7px 14px;font:inherit;font-weight:600;cursor:pointer}
+.hbtn:hover{color:var(--ink)}
+main{max-width:1200px;margin:0 auto;padding:26px 22px 60px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:26px}
+.stat{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat b{font-size:26px;display:block}
+.stat span{font-size:12px;color:var(--ink2)}
+.filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.filters input,.filters select{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink);font:inherit}
+table{width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13px}
+th{text-align:left;padding:11px 14px;color:var(--ink2);font-size:11px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.leadrow{cursor:pointer}
+tr.leadrow:hover{background:var(--sf2)}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.s-new{background:rgba(94,214,154,.14);color:var(--acc)}.s-contacted{background:rgba(141,185,255,.14);color:#8DB9FF}
+.s-qualified{background:rgba(255,193,94,.14);color:#FFC15E}.s-won{background:rgba(62,207,142,.2);color:#8CE6BC}
+.s-lost{background:rgba(237,238,233,.08);color:var(--ink2)}
+.detail{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px}
+.detail h3{margin-bottom:10px}
+.detail .kv{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;font-size:13.5px;margin-bottom:14px}
+.detail .kv i{color:var(--ink2);font-style:normal}
+.detail textarea{width:100%;min-height:80px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--ink);font:inherit;margin:6px 0}
+.detail select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink);font:inherit}
+.maillog{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+.maillog p{font-size:12.5px;color:var(--ink2);padding:4px 0}
+.empty{color:var(--ink2);padding:30px;text-align:center}
+h2{font-size:16px;margin:26px 0 12px}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:700;margin:1px 2px 1px 0;background:rgba(237,238,233,.08);color:var(--ink2)}
+.t-hedg{background:rgba(94,214,154,.14);color:var(--acc)}.t-sortit{background:rgba(255,193,94,.14);color:#FFC15E}.t-services{background:rgba(141,185,255,.14);color:#8DB9FF}
+.q-pending{background:rgba(255,193,94,.14);color:#FFC15E}.q-sent{background:rgba(94,214,154,.14);color:var(--acc)}.q-failed,.q-expired{background:rgba(237,184,148,.14);color:#EDB894}.q-cancelled{background:rgba(237,238,233,.08);color:var(--ink2)}
+.s-subscribed{background:rgba(94,214,154,.14);color:var(--acc)}.s-unsubscribed{background:rgba(237,238,233,.08);color:var(--ink2)}
+.seqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.seq{background:var(--sf);border:1px solid var(--line);border-radius:14px;padding:18px}
+.seq h3{font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seq p{font-size:12.5px;color:var(--ink2);margin:6px 0 10px}
+.seq ol{font-size:13px;padding-left:18px;margin-bottom:10px}
+.seq .nums{font-size:12px;color:var(--ink2)}
+.tgl{position:relative;width:40px;height:22px;flex:none}.tgl input{opacity:0;position:absolute}.tgl span{position:absolute;inset:0;border-radius:99px;background:var(--line);cursor:pointer;transition:.2s}
+.tgl span::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--ink2);transition:.2s}
+.tgl input:checked+span{background:var(--acc)}.tgl input:checked+span::after{left:21px;background:#08110c}
+.warn{background:rgba(255,193,94,.1);border:1px solid rgba(255,193,94,.3);color:#FFC15E;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px}
+.linkbtn{background:none;border:none;color:var(--acc);cursor:pointer;font:inherit;font-size:12px;padding:0}
+.note{color:var(--ink2);font-size:13px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="gate" id="login">
+  <h1>finovex crm</h1>
+  <p>Enter your admin token to continue.</p>
+  <input type="password" id="token" placeholder="Admin token" autocomplete="off">
+  <button id="loginBtn">Unlock</button>
+  <p class="err" id="loginErr"></p>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <h1>finovex crm</h1>
+    <nav>
+      <button data-tab="leads" class="active">Leads</button>
+      <button data-tab="contacts">Contacts</button>
+      <button data-tab="automations">Automations</button>
+      <button data-tab="waitlist">Waitlist</button>
+      <button data-tab="stats">Stats</button>
+    </nav>
+    <span class="spacer"></span>
+    <button class="hbtn" id="csvBtn">Export CSV</button>
+    <button class="hbtn" id="lockBtn">Lock</button>
+  </header>
+  <main>
+    <section id="tab-leads">
+      <div class="filters">
+        <select id="fStatus">
+          <option value="">All statuses</option>
+          <option>new</option><option>contacted</option><option>qualified</option><option>won</option><option>lost</option>
+        </select>
+        <input id="fQ" placeholder="Search name, email, company…">
+      </div>
+      <table><thead><tr><th>#</th><th>Name</th><th>Category</th><th>Email</th><th>Status</th><th>Received</th></tr></thead><tbody id="leadBody"></tbody></table>
+      <div class="detail" id="leadDetail" hidden></div>
+    </section>
+    <section id="tab-contacts" hidden>
+      <p class="note">Everyone who gave us their email: subscribers (pop-up, waitlists, contact-form opt-in), enquiries and notify requests. With cookie consent, each contact is linked to their visits and the products they browsed.</p>
+      <div class="filters">
+        <input id="cQ" placeholder="Search email or name…">
+        <select id="cInt"><option value="">All interests</option><option value="hedg">HEDG</option><option value="sortit">SORT.it</option><option value="services">Services</option></select>
+        <select id="cStatus"><option value="">All statuses</option><option>subscribed</option><option>unsubscribed</option></select>
+        <button class="hbtn" id="cCsv">Export contacts CSV</button>
+      </div>
+      <table><thead><tr><th>#</th><th>Email</th><th>Interests</th><th>Source</th><th>Marketing</th><th>Visits</th><th>Emails</th><th>Last seen</th></tr></thead><tbody id="cBody"></tbody></table>
+      <div class="detail" id="cDetail" hidden></div>
+    </section>
+    <section id="tab-automations" hidden>
+      <div id="smtpWarn" class="warn" hidden>SMTP is not configured yet, so automated emails are <b>waiting in the queue</b>. Add SMTP_HOST, SMTP_USER and SMTP_PASS to .env and they start sending within a minute. Emails that cannot be sent within 14 days expire.</div>
+      <p class="note">Sequences send automatically. Toggle one off to pause it; queued emails for a paused sequence are cancelled at send time.</p>
+      <div class="seqs" id="seqs"></div>
+      <h2>Email queue</h2>
+      <table><thead><tr><th>#</th><th>To</th><th>Sequence</th><th>Subject</th><th>Send at (UTC)</th><th>Status</th><th></th></tr></thead><tbody id="qBody"></tbody></table>
+    </section>
+    <section id="tab-waitlist" hidden>
+      <h2>Waitlist signups</h2>
+      <table><thead><tr><th>#</th><th>Email</th><th>Product</th><th>Source</th><th>Date</th></tr></thead><tbody id="wlBody"></tbody></table>
+      <h2>Notify me requests</h2>
+      <table><thead><tr><th>#</th><th>Email</th><th>Feature</th><th>Date</th></tr></thead><tbody id="ntBody"></tbody></table>
+    </section>
+    <section id="tab-stats" hidden>
+      <div class="stats" id="statCards"></div>
+      <h2>Leads by status</h2><table><tbody id="byStatus"></tbody></table>
+      <h2>Waitlist by product</h2><table><tbody id="byProduct"></tbody></table>
+      <h2>Leads, last 7 days</h2><table><tbody id="last7"></tbody></table>
+    </section>
+  </main>
+</div>
+
+<script>
+let TOKEN = localStorage.getItem('fx_admin') || '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api = (p, o = {}) => fetch(p, {...o, headers: {'Content-Type': 'application/json', 'x-admin-token': TOKEN, ...(o.headers || {})}}).then(async r => ({ok: r.ok, data: await r.json().catch(() => ({}))}));
+
+async function loadLeads() {
+  const st = $('#fStatus').value, q = $('#fQ').value;
+  const {ok, data} = await api('/api/admin/leads?status=' + encodeURIComponent(st) + '&q=' + encodeURIComponent(q));
+  const b = $('#leadBody');
+  if (!ok || !data.leads?.length) { b.innerHTML = '<tr><td colspan="6" class="empty">No leads yet.</td></tr>'; return; }
+  b.innerHTML = data.leads.map(l => `<tr class="leadrow" data-id="${l.id}"><td>${l.id}</td><td><b>${esc(l.name)}</b>${l.company ? '<br><span style="color:var(--ink2)">' + esc(l.company) + '</span>' : ''}</td><td>${esc(l.category)}</td><td>${esc(l.email)}</td><td><span class="chip s-${esc(l.status)}">${esc(l.status)}</span></td><td style="color:var(--ink2)">${esc(l.created_at)}</td></tr>`).join('');
+  b.querySelectorAll('.leadrow').forEach(r => r.onclick = () => loadLead(r.dataset.id));
+}
+async function loadLead(id) {
+  const {ok, data} = await api('/api/admin/leads/' + id);
+  if (!ok) return;
+  const l = data.lead, d = $('#leadDetail');
+  d.hidden = false;
+  d.innerHTML = `<h3>Lead #${l.id} · ${esc(l.name)}</h3>
+    <div class="kv"><i>Email</i><span>${esc(l.email)}</span><i>Phone</i><span>${esc(l.phone) || '—'}</span><i>Company</i><span>${esc(l.company) || '—'}</span>
+    <i>Category</i><span>${esc(l.category)}</span><i>Source</i><span>${esc(l.source)} ${esc(l.referrer)}</span><i>UTM</i><span>${esc(l.utm)}</span><i>IP</i><span>${esc(l.ip)}</span><i>Received</i><span>${esc(l.created_at)}</span>
+    <i>Message</i><span>${esc(l.message).replace(/\n/g, '<br>')}</span></div>
+    <label>Status <select id="dStatus">${['new','contacted','qualified','won','lost'].map(s => `<option ${s === l.status ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
+    <textarea id="dNotes" placeholder="Internal notes…">${esc(l.notes)}</textarea>
+    <button class="hbtn" id="dSave" style="margin-top:8px">Save</button>
+    <div class="maillog"><b>Email log</b>${data.emails?.length ? data.emails.map(e => `<p>→ ${esc(e.to_addr)} · ${esc(e.subject)} · ${esc(e.created_at)}</p>`).join('') : '<p>No emails logged for this lead.</p>'}</div>`;
+  $('#dSave').onclick = async () => {
+    await api('/api/admin/leads/' + id, {method: 'PATCH', body: JSON.stringify({status: $('#dStatus').value, notes: $('#dNotes').value})});
+    $('#dSave').textContent = 'Saved ✓'; setTimeout(() => $('#dSave').textContent = 'Save', 1500); loadLeads();
+  };
+  d.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+const tags = s => String(s || '').split(',').filter(Boolean).map(t => '<span class="tag t-' + esc(t) + '">' + esc(t) + '</span>').join('') || '<span style="color:var(--ink2)">—</span>';
+async function loadContacts() {
+  const q = '?q=' + encodeURIComponent($('#cQ').value) + '&interest=' + $('#cInt').value + '&status=' + $('#cStatus').value;
+  const {ok, data} = await api('/api/admin/contacts' + q);
+  const b = $('#cBody');
+  if (!ok || !data.rows?.length) { b.innerHTML = '<tr><td colspan="8" class="empty">No contacts yet.</td></tr>'; return; }
+  b.innerHTML = data.rows.map(c => `<tr class="leadrow" data-id="${c.id}"><td>${c.id}</td><td><b>${esc(c.email)}</b>${c.name ? '<br><span style="color:var(--ink2)">' + esc(c.name) + '</span>' : ''}</td>
+    <td>${tags(c.interests)}</td><td style="color:var(--ink2)">${esc(c.source)}</td>
+    <td>${c.marketing ? '<span class="chip s-' + esc(c.status) + '">' + esc(c.status) + '</span>' : '<span style="color:var(--ink2)">no opt-in</span>'}</td>
+    <td>${c.visits ?? '—'}${c.pages ? ' <span style="color:var(--ink2)">(' + c.pages + ' pages)</span>' : ''}</td>
+    <td>${c.sent} sent${c.pending ? ' · ' + c.pending + ' queued' : ''}</td><td style="color:var(--ink2)">${esc(c.last_seen)}</td></tr>`).join('');
+  b.querySelectorAll('.leadrow').forEach(r => r.onclick = () => loadContact(r.dataset.id));
+}
+async function loadContact(id) {
+  const {ok, data} = await api('/api/admin/contacts/' + id);
+  if (!ok) return;
+  const c = data.contact, v = data.visitor, d = $('#cDetail');
+  d.hidden = false;
+  let ints = {}; try { ints = JSON.parse(v?.interests || '{}'); } catch (e) {}
+  d.innerHTML = `<h3>${esc(c.email)}</h3>
+    <div class="kv"><i>Name</i><span>${esc(c.name) || '—'}</span><i>Interests</i><span>${tags(c.interests)}</span><i>Source</i><span>${esc(c.source)}</span>
+    <i>Marketing</i><span>${c.marketing ? 'Opted in ' + esc(c.consent_at || '') + ' · <b>' + esc(c.status) + '</b>' : 'No opt-in (transactional only)'}</span>
+    <i>Visitor cookie</i><span>${v ? v.visits + ' visits · ' + v.pages + ' pages · first seen ' + esc(v.first_seen) + ' on ' + esc(v.first_path) + (v.referrer ? ' from ' + esc(v.referrer) : '') : 'Not linked (no cookie consent)'}</span>
+    <i>Product views</i><span>${Object.entries(ints).map(([k, n]) => esc(k) + ': ' + n).join(' · ') || '—'}</span>
+    <i>Enquiries</i><span>${data.leads.map(l => '#' + l.id + ' ' + esc(l.category) + ' (' + esc(l.status) + ')').join(', ') || '—'}</span></div>
+    ${c.marketing ? '<button class="hbtn" id="cToggle">' + (c.status === 'subscribed' ? 'Unsubscribe' : 'Resubscribe') + '</button>' : ''}
+    <div class="maillog"><b>Automated emails</b>${data.queue.length ? data.queue.map(q => '<p><span class="chip q-' + q.status + '">' + q.status + '</span> ' + esc(q.subject) + ' · ' + esc(q.sequence) + ' · ' + esc(q.sent_at || q.send_at) + '</p>').join('') : '<p>None.</p>'}</div>
+    <div class="maillog"><b>Recent pages</b>${data.views.length ? data.views.map(p => '<p>' + esc(p.path) + ' · ' + esc(p.created_at) + '</p>').join('') : '<p>No tracked pages.</p>'}</div>`;
+  const t = $('#cToggle');
+  if (t) t.onclick = async () => { await api('/api/admin/contacts/' + id, {method: 'PATCH', body: JSON.stringify({status: c.status === 'subscribed' ? 'unsubscribed' : 'subscribed'})}); loadContact(id); loadContacts(); };
+  d.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+async function loadAutomations() {
+  const {ok, data} = await api('/api/admin/automations');
+  if (!ok) return;
+  $('#smtpWarn').hidden = data.smtp;
+  $('#seqs').innerHTML = data.sequences.map(s => `<div class="seq"><h3>${esc(s.label)}<label class="tgl" title="Enable / pause"><input type="checkbox" data-seq="${s.key}" ${s.enabled ? 'checked' : ''}><span></span></label></h3>
+    <p>Trigger: ${esc(s.trigger)}</p><ol>${s.steps.map(st => '<li>' + (st.delayDays ? 'Day ' + st.delayDays : 'Immediately') + ' · ' + esc(st.subject) + '</li>').join('')}</ol>
+    <div class="nums">${s.sent} sent · ${s.pending} queued${s.failed ? ' · ' + s.failed + ' failed' : ''}</div></div>`).join('');
+  document.querySelectorAll('[data-seq]').forEach(i => i.onchange = () => api('/api/admin/automations/' + i.dataset.seq, {method: 'PATCH', body: JSON.stringify({enabled: i.checked})}));
+  $('#qBody').innerHTML = data.queue.length ? data.queue.map(q => `<tr><td>${q.id}</td><td>${esc(q.email)}</td><td>${esc(q.sequence)}</td><td>${esc(q.subject)}</td><td style="color:var(--ink2)">${esc(q.sent_at || q.send_at)}</td><td><span class="chip q-${q.status}">${q.status}</span></td><td>${q.status === 'pending' ? '<button class="linkbtn" data-cancel="' + q.id + '">Cancel</button>' : ''}</td></tr>`).join('') : '<tr><td colspan="7" class="empty">Queue is empty.</td></tr>';
+  document.querySelectorAll('[data-cancel]').forEach(b => b.onclick = async () => { await api('/api/admin/queue/' + b.dataset.cancel + '/cancel', {method: 'POST'}); loadAutomations(); });
+}
+async function loadWaitlist() {
+  const w = await api('/api/admin/waitlist'), n = await api('/api/admin/notify');
+  $('#wlBody').innerHTML = w.data.rows?.length ? w.data.rows.map(r => `<tr><td>${r.id}</td><td>${esc(r.email)}</td><td>${r.product}</td><td>${esc(r.source)}</td><td>${esc(r.created_at)}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">Empty.</td></tr>';
+  $('#ntBody').innerHTML = n.data.rows?.length ? n.data.rows.map(r => `<tr><td>${r.id}</td><td>${esc(r.email)}</td><td>${esc(r.feature)}</td><td>${esc(r.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">Empty.</td></tr>';
+}
+async function loadStats(prev) {
+  const {ok, data} = prev ? {ok: true, data: prev} : await api('/api/admin/stats');
+  if (!ok) return;
+  const s = data.stats;
+  $('#statCards').innerHTML = [['Leads', s.leads], ['Contacts', s.contacts], ['Subscribers', s.subscribers], ['Known visitors', s.visitors], ['Emails sent', s.emailsSent], ['Emails queued', s.emailsPending], ['Waitlist', s.waitlist], ['Pageviews', s.pageviews]].map(([k, v]) => `<div class="stat"><b>${v}</b><span>${k}</span></div>`).join('');
+  $('#byStatus').innerHTML = s.byStatus.map(r => `<tr><td>${esc(r.status)}</td><td>${r.c}</td></tr>`).join('') || '<tr><td class="empty">No leads.</td></tr>';
+  $('#byProduct').innerHTML = s.byProduct.map(r => `<tr><td>${esc(r.product)}</td><td>${r.c}</td></tr>`).join('') || '<tr><td class="empty">No signups.</td></tr>';
+  $('#last7').innerHTML = s.last7.map(r => `<tr><td>${esc(r.d)}</td><td>${r.c}</td></tr>`).join('') || '<tr><td class="empty">—</td></tr>';
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  ['leads', 'contacts', 'automations', 'waitlist', 'stats'].forEach(t => $('#tab-' + t).hidden = t !== b.dataset.tab);
+  ({contacts: loadContacts, automations: loadAutomations, leads: loadLeads, waitlist: loadWaitlist, stats: () => loadStats()})[b.dataset.tab]?.();
+});
+ $('#fStatus').onchange = loadLeads;
+ $('#cInt').onchange = loadContacts; $('#cStatus').onchange = loadContacts;
+ $('#cQ').oninput = (() => { let t; return () => { clearTimeout(t); t = setTimeout(loadContacts, 300); }; })();
+ $('#cCsv').onclick = () => fetch('/api/admin/contacts.csv', {headers: {'x-admin-token': TOKEN}}).then(r => r.text()).then(t => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t])); a.download = 'finovex-contacts.csv'; a.click(); });
+ $('#fQ').oninput = (() => { let t; return () => { clearTimeout(t); t = setTimeout(loadLeads, 300); }; })();
+ $('#csvBtn').onclick = () => fetch('/api/admin/export.csv', {headers: {'x-admin-token': TOKEN}})
+  .then(r => r.text()).then(t => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t])); a.download = 'finovex-leads.csv'; a.click(); });
+ $('#lockBtn').onclick = () => { TOKEN = ''; localStorage.removeItem('fx_admin'); location.reload(); };
+
+async function boot() {
+  if (!TOKEN) return;
+  const r = await api('/api/admin/stats');
+  if (!r.ok) { TOKEN = ''; localStorage.removeItem('fx_admin'); $('#loginErr').textContent = r.data.error || 'Invalid token'; return; }
+  $('#login').hidden = true; $('#app').hidden = false;
+  loadStats(r.data); loadLeads(); loadWaitlist(); loadContacts(); loadAutomations();
+}
+ $('#loginBtn').onclick = async () => {
+  TOKEN = $('#token').value.trim();
+  const r = await api('/api/admin/stats');
+  if (!r.ok) { $('#loginErr').textContent = r.data.error || 'Invalid token'; return; }
+  localStorage.setItem('fx_admin', TOKEN); boot();
+};
+ $('#token').addEventListener('keydown', e => e.key === 'Enter' && $('#loginBtn').click());
+boot();
+</script>
+</body>
+</html>
